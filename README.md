@@ -261,7 +261,7 @@ Supabaseプロジェクトはアプリ利用者または開発者が事前に作
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
 実際に使用する環境変数名は、採用するSupabaseクライアントライブラリの推奨に合わせて実装時に最終確認する。値をGit管理対象のファイルへ直接記載しない。
