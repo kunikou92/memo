@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      await supabase.auth.signOut({ scope: "local" });
       return redirectToLogin(request, "confirmed");
     }
   }
@@ -40,6 +41,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
+      await supabase.auth.signOut({ scope: "local" });
       return redirectToLogin(request, "confirmed");
     }
   }

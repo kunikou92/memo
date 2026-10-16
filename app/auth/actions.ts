@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 import type { AuthFormState } from "@/app/auth/state";
 import { createClient } from "@/lib/supabase/server";
@@ -145,4 +146,16 @@ export async function login(
   }
 
   redirect("/notes");
+}
+
+export async function logout() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+
+  if (data?.claims) {
+    await supabase.auth.signOut({ scope: "local" });
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/login");
 }
