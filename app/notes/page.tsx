@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
+import { DeleteNoteForm } from "@/app/notes/delete-note-form";
 import { LogoutButton } from "@/components/auth/logout-button";
-import { Button, EmptyState, ErrorMessage } from "@/components/ui";
+import { EmptyState, ErrorMessage } from "@/components/ui";
 import { requireAuthenticatedUser } from "@/lib/auth";
 import { formatJapaneseDateTime } from "@/lib/date";
 import { createClient } from "@/lib/supabase/server";
@@ -78,13 +79,10 @@ export default async function NotesPage() {
                     >
                       編集
                     </Link>
-                    <Button
-                      variant="secondary"
-                      disabled
-                      title="削除機能は次のタスクで実装します"
-                    >
-                      削除
-                    </Button>
+                    <DeleteNoteForm
+                      noteId={note.id}
+                      noteTitle={note.title}
+                    />
                   </div>
                 </article>
               </li>

@@ -12,3 +12,12 @@ export type NoteFormState = {
 export const initialNoteFormState: NoteFormState = {
   status: "idle",
 };
+
+export type DeleteNoteState = {
+  status: "idle" | "error";
+  message?: string;
+};
+
+export const initialDeleteNoteState: DeleteNoteState = {
+  status: "idle",
+};

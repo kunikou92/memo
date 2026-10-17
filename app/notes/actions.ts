@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import type { NoteFormState } from "@/app/notes/state";
+import type { DeleteNoteState, NoteFormState } from "@/app/notes/state";
 import { requireAuthenticatedUserForAction } from "@/lib/auth";
 import {
   isNoteId,
@@ -112,4 +112,45 @@ export async function updateNote(
   revalidatePath("/notes");
   revalidatePath(`/notes/${noteId}/edit`);
   redirect("/notes");
+}
+
+export async function deleteNote(
+  _previousState: DeleteNoteState,
+  formData: FormData,
+): Promise<DeleteNoteState> {
+  const userId = await requireAuthenticatedUserForAction();
+  const noteId = String(formData.get("noteId") ?? "");
+
+  if (!isNoteId(noteId)) {
+    return {
+      status: "error",
+      message: "削除対象のメモを確認できませんでした。画面を再読み込みしてください。",
+    };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("notes")
+      .delete()
+      .eq("id", noteId)
+      .eq("user_id", userId)
+      .select("id")
+      .maybeSingle();
+
+    if (error || !data) {
+      return {
+        status: "error",
+        message: "メモを削除できませんでした。画面を再読み込みして再度お試しください。",
+      };
+    }
+  } catch {
+    return {
+      status: "error",
+      message: "通信に失敗しました。接続を確認して再度お試しください。",
+    };
+  }
+
+  revalidatePath("/notes");
+  return { status: "idle" };
 }
