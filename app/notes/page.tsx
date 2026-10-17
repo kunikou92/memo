@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Button, EmptyState, ErrorMessage } from "@/components/ui";
@@ -11,7 +12,10 @@ export const metadata: Metadata = {
   title: "メモ | メモアプリ",
 };
 
+export const instant = false;
+
 export default async function NotesPage() {
+  await connection();
   const userId = await requireAuthenticatedUser();
   const supabase = await createClient();
   const { data: notes, error } = await supabase

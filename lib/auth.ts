@@ -1,14 +1,11 @@
 import "server-only";
 
+import { cacheLife } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-export async function hasValidSession() {
-  return Boolean(await getAuthenticatedUserId());
-}
-
-export async function getAuthenticatedUserId() {
+async function readAuthenticatedUserId() {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getClaims();
@@ -20,8 +17,29 @@ export async function getAuthenticatedUserId() {
   }
 }
 
+export async function getAuthenticatedUserId() {
+  "use cache: private";
+
+  cacheLife({ stale: 30 });
+  return readAuthenticatedUserId();
+}
+
+export async function hasValidSession() {
+  return Boolean(await getAuthenticatedUserId());
+}
+
 export async function requireAuthenticatedUser() {
   const userId = await getAuthenticatedUserId();
+
+  if (!userId) {
+    redirect("/login");
+  }
+
+  return userId;
+}
+
+export async function requireAuthenticatedUserForAction() {
+  const userId = await readAuthenticatedUserId();
 
   if (!userId) {
     redirect("/login");

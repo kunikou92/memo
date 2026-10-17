@@ -6,6 +6,10 @@ import { useActionState } from "react";
 import { createNote } from "@/app/notes/actions";
 import { initialNoteFormState } from "@/app/notes/state";
 import { Button, ErrorMessage, Textarea, TextInput } from "@/components/ui";
+import {
+  NOTE_CONTENT_MAX_LENGTH,
+  NOTE_TITLE_MAX_LENGTH,
+} from "@/lib/notes";
 
 export function NewNoteForm() {
   const [state, formAction, pending] = useActionState(
@@ -19,7 +23,7 @@ export function NewNoteForm() {
         id="note-title"
         name="title"
         label="タイトル"
-        maxLength={100}
+        maxLength={NOTE_TITLE_MAX_LENGTH}
         required
         disabled={pending}
         error={state.fieldErrors?.title}
@@ -29,7 +33,7 @@ export function NewNoteForm() {
         id="note-content"
         name="content"
         label="本文"
-        maxLength={10_000}
+        maxLength={NOTE_CONTENT_MAX_LENGTH}
         disabled={pending}
         error={state.fieldErrors?.content}
         hint="10,000文字以内（空欄でも保存できます）"
