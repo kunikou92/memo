@@ -42,7 +42,7 @@ export function DeleteNoteForm({ noteId, noteTitle }: DeleteNoteFormProps) {
         </Button>
       </form>
       {state.status === "error" && state.message ? (
-        <p role="alert" className="max-w-64 text-sm text-red-700">
+        <p role="alert" className="max-w-64 break-words text-sm text-red-700">
           {state.message}
         </p>
       ) : null}

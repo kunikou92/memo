@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { EmptyState, ErrorMessage } from "@/components/ui";
 import { requireAuthenticatedUser } from "@/lib/auth";
 import { formatJapaneseDateTime } from "@/lib/date";
+import { USER_MESSAGES } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -52,7 +53,15 @@ export default async function NotesPage() {
         </div>
 
         {error ? (
-          <ErrorMessage message="メモを取得できませんでした。時間をおいて再度お試しください。" />
+          <div className="space-y-3">
+            <ErrorMessage message={USER_MESSAGES.notes.loadFailed} />
+            <a
+              href="/notes"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-600 focus-visible:ring-offset-2"
+            >
+              再試行
+            </a>
+          </div>
         ) : notes && notes.length > 0 ? (
           <ul className="space-y-3">
             {notes.map((note) => (
@@ -72,7 +81,7 @@ export default async function NotesPage() {
                       </time>
                     </p>
                   </div>
-                  <div className="flex shrink-0 gap-2">
+                  <div className="flex flex-wrap gap-2 sm:shrink-0">
                     <Link
                       href={`/notes/${note.id}/edit`}
                       className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-600 focus-visible:ring-offset-2"

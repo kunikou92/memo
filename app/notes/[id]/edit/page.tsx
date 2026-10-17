@@ -4,7 +4,9 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { EditNoteForm } from "@/app/notes/[id]/edit/edit-note-form";
+import { ErrorMessage } from "@/components/ui";
 import { requireAuthenticatedUser } from "@/lib/auth";
+import { USER_MESSAGES } from "@/lib/messages";
 import { isNoteId } from "@/lib/notes";
 import { createClient } from "@/lib/supabase/server";
 
@@ -37,7 +39,22 @@ async function EditNoteContent({ params }: EditNotePageProps) {
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error || !note) {
+  if (error) {
+    return (
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <h1 className="text-2xl font-bold text-slate-950">メモを編集</h1>
+        <ErrorMessage message={USER_MESSAGES.notes.loadFailed} />
+        <a
+          href={`/notes/${id}/edit`}
+          className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-600 focus-visible:ring-offset-2"
+        >
+          再試行
+        </a>
+      </section>
+    );
+  }
+
+  if (!note) {
     redirect("/notes");
   }
 

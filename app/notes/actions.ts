@@ -10,6 +10,7 @@ import {
   NOTE_CONTENT_MAX_LENGTH,
   NOTE_TITLE_MAX_LENGTH,
 } from "@/lib/notes";
+import { USER_MESSAGES } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
 
 function validateNote(formData: FormData) {
@@ -52,13 +53,13 @@ export async function createNote(
     if (error) {
       return {
         status: "error",
-        message: "メモを保存できませんでした。時間をおいて再度お試しください。",
+        message: USER_MESSAGES.notes.saveFailed,
       };
     }
   } catch {
     return {
       status: "error",
-      message: "通信に失敗しました。接続を確認して再度お試しください。",
+      message: USER_MESSAGES.communicationError,
     };
   }
 
@@ -76,7 +77,7 @@ export async function updateNote(
   if (!isNoteId(noteId)) {
     return {
       status: "error",
-      message: "編集対象のメモを確認できませんでした。一覧から開き直してください。",
+      message: USER_MESSAGES.notes.unavailable,
     };
   }
 
@@ -99,13 +100,15 @@ export async function updateNote(
     if (error || !data) {
       return {
         status: "error",
-        message: "メモを更新できませんでした。一覧から開き直して再度お試しください。",
+        message: error
+          ? USER_MESSAGES.notes.saveFailed
+          : USER_MESSAGES.notes.unavailable,
       };
     }
   } catch {
     return {
       status: "error",
-      message: "通信に失敗しました。接続を確認して再度お試しください。",
+      message: USER_MESSAGES.communicationError,
     };
   }
 
@@ -124,7 +127,7 @@ export async function deleteNote(
   if (!isNoteId(noteId)) {
     return {
       status: "error",
-      message: "削除対象のメモを確認できませんでした。画面を再読み込みしてください。",
+      message: USER_MESSAGES.notes.unavailable,
     };
   }
 
@@ -141,13 +144,15 @@ export async function deleteNote(
     if (error || !data) {
       return {
         status: "error",
-        message: "メモを削除できませんでした。画面を再読み込みして再度お試しください。",
+        message: error
+          ? USER_MESSAGES.notes.deleteFailed
+          : USER_MESSAGES.notes.unavailable,
       };
     }
   } catch {
     return {
       status: "error",
-      message: "通信に失敗しました。接続を確認して再度お試しください。",
+      message: USER_MESSAGES.communicationError,
     };
   }
 

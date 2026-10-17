@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 import type { AuthFormState } from "@/app/auth/state";
+import { USER_MESSAGES } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
 
 type FieldErrors = {
@@ -60,7 +61,7 @@ function signupErrorMessage(code?: string) {
     case "over_request_rate_limit":
       return "短時間に多くの操作が行われました。しばらく待ってから再度お試しください。";
     default:
-      return "新規登録に失敗しました。時間をおいて再度お試しください。";
+      return USER_MESSAGES.auth.signupFailed;
   }
 }
 
@@ -73,7 +74,7 @@ function loginErrorMessage(code?: string) {
     case "over_request_rate_limit":
       return "短時間に多くの操作が行われました。しばらく待ってから再度お試しください。";
     default:
-      return "ログインに失敗しました。時間をおいて再度お試しください。";
+      return USER_MESSAGES.auth.loginFailed;
   }
 }
 
@@ -107,7 +108,7 @@ export async function signup(
   } catch {
     return {
       status: "error",
-      message: "通信に失敗しました。接続を確認して再度お試しください。",
+      message: USER_MESSAGES.communicationError,
     };
   }
 
@@ -141,7 +142,7 @@ export async function login(
   } catch {
     return {
       status: "error",
-      message: "通信に失敗しました。接続を確認して再度お試しください。",
+      message: USER_MESSAGES.communicationError,
     };
   }
 

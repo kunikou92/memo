@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { LoginForm } from "@/app/login/login-form";
 import { ErrorMessage } from "@/components/ui";
+import { USER_MESSAGES } from "@/lib/messages";
 
 export const metadata: Metadata = {
   title: "ログイン | メモアプリ",
@@ -33,7 +34,7 @@ async function LoginStatus({
 
   if (params.error === "confirmation") {
     return (
-      <ErrorMessage message="認証リンクを確認できませんでした。リンクの期限切れ、または使用済みの可能性があります。" />
+      <ErrorMessage message={USER_MESSAGES.auth.confirmationFailed} />
     );
   }
 
