@@ -5,20 +5,29 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export async function hasValidSession() {
+  return Boolean(await getAuthenticatedUserId());
+}
+
+export async function getAuthenticatedUserId() {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getClaims();
+    const userId = data?.claims?.sub;
 
-    return !error && Boolean(data?.claims?.sub);
+    return !error && typeof userId === "string" ? userId : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 export async function requireAuthenticatedUser() {
-  if (!(await hasValidSession())) {
+  const userId = await getAuthenticatedUserId();
+
+  if (!userId) {
     redirect("/login");
   }
+
+  return userId;
 }
 
 export async function redirectAuthenticatedUser() {
