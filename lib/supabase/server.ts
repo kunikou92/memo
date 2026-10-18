@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { clearAuthCookiesAtScopes, createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 import { getSupabaseEnv } from "@/lib/supabase/env";
@@ -23,5 +23,24 @@ export async function createClient() {
         }
       },
     },
+  });
+}
+
+export async function clearSupabaseAuthCookies() {
+  const cookieStore = await cookies();
+  const { supabaseUrl } = getSupabaseEnv();
+  const projectReference = new URL(supabaseUrl).hostname.split(".")[0];
+
+  await clearAuthCookiesAtScopes({
+    getAll() {
+      return cookieStore.getAll();
+    },
+    setAll(cookiesToSet) {
+      cookiesToSet.forEach(({ name, value, options }) => {
+        cookieStore.set(name, value, options);
+      });
+    },
+    storageKey: `sb-${projectReference}-auth-token`,
+    scopes: [{ path: "/" }],
   });
 }

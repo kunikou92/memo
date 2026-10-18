@@ -6,7 +6,10 @@ import { revalidatePath } from "next/cache";
 
 import type { AuthFormState } from "@/app/auth/state";
 import { USER_MESSAGES } from "@/lib/messages";
-import { createClient } from "@/lib/supabase/server";
+import {
+  clearSupabaseAuthCookies,
+  createClient,
+} from "@/lib/supabase/server";
 
 type FieldErrors = {
   email?: string;
@@ -150,11 +153,14 @@ export async function login(
 }
 
 export async function logout() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-
-  if (data?.claims) {
+  try {
+    const supabase = await createClient();
     await supabase.auth.signOut({ scope: "local" });
+  } catch {
+    // The local cookies are still cleared below when Supabase Auth is
+    // temporarily unavailable or the stored session cannot be refreshed.
+  } finally {
+    await clearSupabaseAuthCookies();
   }
 
   revalidatePath("/", "layout");
