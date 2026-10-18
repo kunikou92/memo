@@ -13,6 +13,25 @@ import {
 import { USER_MESSAGES } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/server";
 
+type DatabaseError = {
+  code?: string;
+  message?: string;
+};
+
+function noteMutationErrorMessage(
+  error: DatabaseError,
+  fallbackMessage: string,
+) {
+  if (
+    error.code === "P0001" &&
+    error.message === "note_write_rate_limit_exceeded"
+  ) {
+    return USER_MESSAGES.notes.rateLimitExceeded;
+  }
+
+  return fallbackMessage;
+}
+
 function validateNote(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const content = String(formData.get("content") ?? "");
@@ -53,7 +72,10 @@ export async function createNote(
     if (error) {
       return {
         status: "error",
-        message: USER_MESSAGES.notes.saveFailed,
+        message: noteMutationErrorMessage(
+          error,
+          USER_MESSAGES.notes.saveFailed,
+        ),
       };
     }
   } catch {
@@ -101,7 +123,7 @@ export async function updateNote(
       return {
         status: "error",
         message: error
-          ? USER_MESSAGES.notes.saveFailed
+          ? noteMutationErrorMessage(error, USER_MESSAGES.notes.saveFailed)
           : USER_MESSAGES.notes.unavailable,
       };
     }
@@ -145,7 +167,7 @@ export async function deleteNote(
       return {
         status: "error",
         message: error
-          ? USER_MESSAGES.notes.deleteFailed
+          ? noteMutationErrorMessage(error, USER_MESSAGES.notes.deleteFailed)
           : USER_MESSAGES.notes.unavailable,
       };
     }
